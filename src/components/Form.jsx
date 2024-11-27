@@ -51,34 +51,31 @@ const Form = () => {
     e.preventDefault();
     console.log('Отправляемые данные:', JSON.stringify(formData, null, 2));
 
-
     try {
-      const response = await fetch(
-        '/rec_sys/recommend/',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            
-            
-          },
-          body: JSON.stringify(formData, null, 2),
-         
+        const response = await fetch(
+            '/rec_sys/recommend/',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            }
+        );
+
+        // Проверяем, что ответ есть и в формате JSON
+        if (!response.ok) {
+            throw new Error(`Ошибка HTTP: ${response.status}`);
         }
-      );
 
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTP: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('Ответ от сервера:', data); // Логируем ответ
-      alert('Данные успешно отправлены!');
+        const data = await response.json(); // Попытка прочитать JSON из ответа
+        console.log('Ответ от сервера:', data);
+        alert('Данные успешно отправлены!');
     } catch (error) {
-      console.error('Ошибка отправки данных:', error);
-      alert('Произошла ошибка при отправке данных.');
+        console.error('Ошибка отправки данных:', error);
+        alert('Произошла ошибка при отправке данных.');
     }
-  };
+};
 
   return (
     <div className={styles.container}>
