@@ -50,32 +50,43 @@ const Form = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Отправляемые данные:', JSON.stringify(formData, null, 2));
-
+  
     try {
-        const response = await fetch(
-            '/rec_sys/recommend/',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            }
-        );
+      const response = await fetch('/rec_sys/recommend/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData, null, 2),
+      });
+  
+      // Логируем весь ответ
+      console.log('Ответ от сервера:', response);
+      
+      if (response.status === 204 || !response.body) {
+        alert('Сервер вернул пустой ответ.');
+        return;
+      }
 
-        // Проверяем, что ответ есть и в формате JSON
-        if (!response.ok) {
-            throw new Error(`Ошибка HTTP: ${response.status}`);
-        }
-
-        const data = await response.json(); // Попытка прочитать JSON из ответа
-        console.log('Ответ от сервера:', data);
-        alert('Данные успешно отправлены!');
+      if (!response.ok) {
+        throw new Error(`Ошибка HTTP: ${response.status}`);
+      }
+  
+      // Проверяем, есть ли тело у ответа
+      if (response.headers.get('content-length') === '0') {
+        console.warn('Сервер вернул пустой ответ.');
+        return alert('Сервер вернул пустой ответ.');
+      }
+  
+      const data = await response.json();
+      console.log('Полученные данные:', data);
+  
+      alert('Данные успешно отправлены!');
     } catch (error) {
-        console.error('Ошибка отправки данных:', error);
-        alert('Произошла ошибка при отправке данных.');
+      console.error('Ошибка отправки данных:', error);
+      alert('Произошла ошибка при отправке данных.');
     }
-};
+  };
 
   return (
     <div className={styles.container}>
