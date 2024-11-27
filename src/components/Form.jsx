@@ -18,7 +18,7 @@ const Form = () => {
     },
   });
 
-
+  // const jsonString = JSON.stringify(formData);
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -47,42 +47,32 @@ const Form = () => {
     }
   };
 
-  
- 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Отправляемые данные:', JSON.stringify(formData, null, 2));
-  
+
+
     try {
-      const response = await fetch('/rec_sys/recommend/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-  
-      console.log('Ответ от сервера:', response);
-  
+      const response = await fetch(
+        '/rec_sys/recommend/',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            
+            
+          },
+          body: JSON.stringify(formData, null, 2),
+         
+        }
+      );
+
       if (!response.ok) {
         throw new Error(`Ошибка HTTP: ${response.status}`);
       }
-  
-      // Проверяем статус 204 (No Content) или пустое тело
-      if (response.status === 204 || response.headers.get('content-length') === '0') {
-        console.warn('Сервер вернул пустой ответ.');
-        alert('Запрос выполнен, но сервер вернул пустой ответ.');
-        return;
-      }
-  
-      const text = await response.text();
-      if (text) {
-          const data = JSON.parse(text); // Если тело не пустое, парсим JSON
-          console.log("Ответ от сервера:", data);
-      } else {
-          console.warn("Сервер вернул пустой ответ.");
-      }
-  
+
+      const data = await response.json();
+      console.log('Ответ от сервера:', data); // Логируем ответ
       alert('Данные успешно отправлены!');
     } catch (error) {
       console.error('Ошибка отправки данных:', error);
