@@ -54,7 +54,7 @@ const Form = () => {
 
     try {
       const response = await fetch(
-        '/rec_sys/recommend/',
+        'https://tyuiu-fastapi-rec-sys.onrender.com/rec_sys/recommend/',
         {
           method: 'POST',
           headers: {
@@ -62,7 +62,7 @@ const Form = () => {
             
             
           },
-          body: JSON.stringify(formData, null, 2),
+          body: JSON.stringify(formData),
          
         }
       );
