@@ -66,7 +66,7 @@ const HomeSection = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            mode:'no-cors'
+           
             
           },
           body: JSON.stringify(formData, null, 2),
