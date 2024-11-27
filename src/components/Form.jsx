@@ -18,7 +18,7 @@ const Form = () => {
     },
   });
 
-  // const jsonString = JSON.stringify(formData);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -48,7 +48,7 @@ const Form = () => {
   };
 
   
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Отправляемые данные:', JSON.stringify(formData, null, 2));
