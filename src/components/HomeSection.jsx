@@ -80,8 +80,13 @@ const HomeSection = () => {
         return;
       }
   
-      const data = await response.json(); // Парсим JSON, если он есть
-      console.log('Полученные данные:', data);
+      const text = await response.text();
+      if (text) {
+          const data = JSON.parse(text); // Если тело не пустое, парсим JSON
+          console.log("Ответ от сервера:", data);
+      } else {
+          console.warn("Сервер вернул пустой ответ.");
+      }
   
       alert('Данные успешно отправлены!');
     } catch (error) {
