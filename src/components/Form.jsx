@@ -47,12 +47,14 @@ const Form = () => {
     }
   };
 
+  const API_URL = process.env.REACT_APP_API_URL;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Отправляемые данные:', JSON.stringify(formData, null, 2));
   
     try {
-      const response = await fetch('/rec_sys/recommend/', {
+      const response = await fetch(`${API_URL}/rec_sys/recommend/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
