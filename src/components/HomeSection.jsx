@@ -4,9 +4,7 @@ import styles from './Form.module.css';
 const HomeSection = () => {
     const [isFormVisible, setFormVisible] = useState(false);
 
-    const handleButtonClick = () => {
-        setFormVisible(true); // Показать форму при клике
-    };
+    
 
     const Form = () => {
   const [formData, setFormData] = useState({
@@ -57,29 +55,32 @@ const HomeSection = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Отправляемые данные:', JSON.stringify(formData, null, 2));
-
-
+  
     try {
-      const response = await fetch(
-        '/rec_sys/recommend/',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-           
-            
-          },
-          body: JSON.stringify(formData, null, 2),
-         
-        }
-      );
-
+      const response = await fetch('/rec_sys/recommend/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      console.log('Ответ от сервера:', response);
+  
       if (!response.ok) {
         throw new Error(`Ошибка HTTP: ${response.status}`);
       }
-
-      const data = await response.json();
-      console.log('Ответ от сервера:', data); // Логируем ответ
+  
+      // Проверяем статус 204 (No Content) или пустое тело
+      if (response.status === 204 || response.headers.get('content-length') === '0') {
+        console.warn('Сервер вернул пустой ответ.');
+        alert('Запрос выполнен, но сервер вернул пустой ответ.');
+        return;
+      }
+  
+      const data = await response.json(); // Парсим JSON, если он есть
+      console.log('Полученные данные:', data);
+  
       alert('Данные успешно отправлены!');
     } catch (error) {
       console.error('Ошибка отправки данных:', error);
@@ -227,13 +228,7 @@ const HomeSection = () => {
     return (
         <section className="home">
             <div className="content">
-            {/* {!isFormVisible && (
-                <>
-                <h3>О нашей рекомендательной системе</h3>
-                
-                <button onClick={handleButtonClick} className="btn">Рассчитать</button>
-                </>
-            )} */}
+            
                 {isFormVisible && <Form />}
             </div>
         </section>
