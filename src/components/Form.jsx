@@ -1,50 +1,67 @@
 import React, { useState } from 'react';
 import styles from './Form.module.css';
+ 
 
 const Form = () => {
   const [formData, setFormData] = useState({
-    top_n: 0,
+    top_n: '',
     user: {
       gender: '',
-      age: 0,
+      age: '',
       sport: '',
       foreign: '',
-      gpa: 0.0,
-      total_points: 0,
-      bonus_points: 0,
+      gpa: '',
+      total_points: '',
+      bonus_points: '',
       exams: [],
       education: '',
-      study_form: '',
-    },
+      study_form: ''
+    }
   });
 
-  // const jsonString = JSON.stringify(formData);
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const [responseMessage, setResponseMessage] = useState('');
+  const [recommendations, setRecommendations] = useState([]); // Состояние для направлений
+  const [isModalOpen, setIsModalOpen] = useState(false); // Состояние модального окна
 
-    if (name === 'exams') {
-      // Разделяем введенные экзамены через запятую
-      const examsArray = value.split(',').map((exam) => exam.trim());
-      setFormData({
-        ...formData,
-        user: { ...formData.user, exams: examsArray },
-      });
-    } else if (['age', 'gpa', 'total_points', 'bonus_points'].includes(name)) {
-      // Приведение числовых полей к числам
-      setFormData({
-        ...formData,
-        user: { ...formData.user, [name]: parseFloat(value) || 0 },
-      });
-    } else if (name === 'top_n') {
-      // Обновляем поле top_n
-      setFormData({ ...formData, top_n: parseInt(value, 10) || 0 });
+  const handleChange = (e) => {
+    if (e.target.name === 'exams') {
+      let newExams = [...formData.user.exams];
+      newExams.push(e.target.value);
+      setFormData({ ...formData, user: { ...formData.user, exams: newExams } });
     } else {
-      // Обновляем остальные текстовые поля
-      setFormData({
-        ...formData,
-        user: { ...formData.user, [name]: value },
-      });
+      setFormData({ ...formData, user: { ...formData.user, [e.target.name]: e.target.value } });
     }
+  };
+
+  const egeExams = [
+    'Русский язык',
+    'Математика',
+    'Физика',
+    'Химия',
+    'Биология',
+    'Информатика',
+    'История',
+    'Обществознание',
+    'Литература',
+    'География',
+    'Иностранный язык',
+  ];
+
+  const handleExamChange = (e) => {
+    const { value, checked } = e.target;
+    setFormData((prevFormData) => {
+      const updatedExams = checked
+        ? [...prevFormData.user.exams, value] // Добавляем экзамен
+        : prevFormData.user.exams.filter((exam) => exam !== value); // Убираем экзамен
+  
+      return {
+        ...prevFormData,
+        user: {
+          ...prevFormData.user,
+          exams: updatedExams, // Обновляем список экзаменов
+        },
+      };
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -62,7 +79,7 @@ const Form = () => {
             
             
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(formData, null, 2),
          
         }
       );
@@ -72,12 +89,21 @@ const Form = () => {
       }
 
       const data = await response.json();
-      console.log('Ответ от сервера:', data); // Логируем ответ
-      alert('Данные успешно отправлены!');
+      if (data.status === 'ok') {
+        setResponseMessage('Данные успешно отправлены!');
+        setRecommendations(data.data); // Сохраняем направления в состоянии
+        setIsModalOpen(true); // Открываем модальное окно
+      } else {
+        setResponseMessage('Ошибка при обработке данных.');
+      }
     } catch (error) {
       console.error('Ошибка отправки данных:', error);
-      alert('Произошла ошибка при отправке данных.');
+      setResponseMessage('Произошла ошибка при отправке данных.');
     }
+  };
+  
+  const closeModal = () => {
+    setIsModalOpen(false); // Закрыть модальное окно
   };
 
   return (
@@ -85,24 +111,12 @@ const Form = () => {
       <form onSubmit={handleSubmit} className={styles.form}>
         <label className={styles.label}>
           Количество направлений:
-          <input
-            type="number"
-            value={formData.top_n}
-            name="top_n"
-            onChange={handleChange}
-            required
-          />
+          <input type="number" value={formData.top_n} onChange={(e) => setFormData({ ...formData, top_n: e.target.value })} required />
         </label>
 
         <fieldset className={styles.fieldset}>
           <label className={styles.label}>
-            Пол:
-            <select
-              value={formData.user.gender}
-              name="gender"
-              onChange={handleChange}
-              required
-            >
+            <select value={formData.user.gender} name="gender" onChange={handleChange} required>
               <option value="">Выберите пол</option>
               <option value="М">Мужской</option>
               <option value="Ж">Женский</option>
@@ -111,108 +125,95 @@ const Form = () => {
 
           <label className={styles.label}>
             Возраст:
-            <input
-              type="number"
-              value={formData.user.age}
-              name="age"
-              onChange={handleChange}
-              required
-            />
+            <input type="number" value={formData.user.age} name="age" onChange={handleChange} required />
           </label>
 
           <label className={styles.label}>
             Вид спорта:
-            <input
-              type="text"
-              value={formData.user.sport}
-              name="sport"
-              onChange={handleChange}
-              required
-            />
+            <input type="text" value={formData.user.sport} name="sport" onChange={handleChange} required />
           </label>
 
           <label className={styles.label}>
             Гражданство:
-            <input
-              type="text"
-              value={formData.user.foreign}
-              name="foreign"
-              onChange={handleChange}
-              required
-            />
+            <input type="text" value={formData.user.foreign} name="foreign" onChange={handleChange} required />
           </label>
 
           <label className={styles.label}>
             Средний балл (GPA):
-            <input
-              type="number"
-              step="0.01"
-              value={formData.user.gpa}
-              name="gpa"
-              onChange={handleChange}
-              required
-            />
+            <input type="number" step="0.01" value={formData.user.gpa} name="gpa" onChange={handleChange} required />
           </label>
 
           <label className={styles.label}>
             Общее количество баллов:
-            <input
-              type="number"
-              value={formData.user.total_points}
-              name="total_points"
-              onChange={handleChange}
-              required
-            />
+            <input type="number" value={formData.user.total_points} name="total_points" onChange={handleChange} required />
           </label>
 
           <label className={styles.label}>
             Дополнительные баллы:
-            <input
-              type="number"
-              value={formData.user.bonus_points}
-              name="bonus_points"
-              onChange={handleChange}
-              required
-            />
+            <input type="number" value={formData.user.bonus_points} name="bonus_points" onChange={handleChange} required />
           </label>
 
-          <label className={styles.label}>
-            Экзамены:
-            <input
-              type="text"
-              name="exams"
-              placeholder="Введите названия через запятую"
-              onChange={handleChange}
-            />
-          </label>
+          <label className={styles.label}>Выберите экзамены:</label>
+          <div className={styles.checkboxes}>
+            {egeExams.map((exam, index) => (
+              <label key={index} className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  value={exam}
+                  checked={formData.user.exams.includes(exam)}
+                  onChange={handleExamChange}
+                />
+                {exam}
+              </label>
+            ))}
+          </div>
+         
 
           <label className={styles.label}>
-            Образование:
-            <input
-              type="text"
-              value={formData.user.education}
-              name="education"
-              onChange={handleChange}
-              required
-            />
-          </label>
+  Вид образования:
+  <select name="education" value={formData.education} onChange={handleChange} required >
+    <option value="">Выберите вид образования</option>
+    <option value="Начальное общее образование">Начальное общее образование</option>
+    <option value="Среднее общее образование">Среднее общее образование</option>
+    <option value="Высшее общее образование">Высшее общее образование</option>
+  </select>
+</label>
 
           <label className={styles.label}>
-            Форма обучения:
-            <input
-              type="text"
-              value={formData.user.study_form}
-              name="study_form"
-              onChange={handleChange}
-              required
-            />
-          </label>
+  Форма обучения:
+  <select name="study_form" value={formData.user.study_form} onChange={handleChange} required >
+    <option value="">Выберите форму обучения</option>
+    <option value="Очная">Очная</option>
+    <option value="Заочная">Заочная</option>
+    <option value="Очно-заочная">Очно-заочная</option>
+  </select>
+</label>
         </fieldset>
 
-        <button type="submit" className={styles.button}>
-          Отправить
-        </button>
+        <button type="submit" className={styles.button}>Рассчитать</button>
       </form>
+
+      {/* Модальное окно */}
+      {isModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <button className={styles.closeButton} onClick={closeModal}>
+              &times;
+            </button>
+            <h3>Результаты</h3>
+            
+            <div className={styles.recommendationsContainer}>
+              <ul className={styles.recommendations}>
+                {recommendations.map((item, index) => (
+                  <li key={index}>{item.replace('Направление подготовки_', '')}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 };
