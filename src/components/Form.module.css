@@ -179,3 +179,28 @@ input[type="checkbox"] {
   font-size: 14px;
   color: #333;
 }
+.examsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.examCard {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.examCard:hover {
+  background-color: #e0e0e0;
+}
+
+.selectedExam {
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
+}

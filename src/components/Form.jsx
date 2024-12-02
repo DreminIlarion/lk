@@ -47,18 +47,16 @@ const Form = () => {
     'Иностранный язык',
   ];
 
-  const handleExamChange = (e) => {
-    const { value, checked } = e.target;
+  const handleExamClick = (exam) => {
     setFormData((prevFormData) => {
-      const updatedExams = checked
-        ? [...prevFormData.user.exams, value] // Добавляем экзамен
-        : prevFormData.user.exams.filter((exam) => exam !== value); // Убираем экзамен
-  
+      const updatedExams = prevFormData.user.exams.includes(exam)
+        ? prevFormData.user.exams.filter((item) => item !== exam) // Убираем экзамен
+        : [...prevFormData.user.exams, exam]; // Добавляем экзамен
       return {
         ...prevFormData,
         user: {
           ...prevFormData.user,
-          exams: updatedExams, // Обновляем список экзаменов
+          exams: updatedExams,
         },
       };
     });
@@ -153,20 +151,22 @@ const Form = () => {
             <input type="number" value={formData.user.bonus_points} name="bonus_points" onChange={handleChange} required />
           </label>
 
-          <label className={styles.label}>Выберите экзамены:</label>
-          <div className={styles.checkboxes}>
-            {egeExams.map((exam, index) => (
-              <label key={index} className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  value={exam}
-                  checked={formData.user.exams.includes(exam)}
-                  onChange={handleExamChange}
-                />
-                {exam}
-              </label>
-            ))}
-          </div>
+          <label className={styles.label}>
+            Выберите экзамены:
+            <div className={styles.examsContainer}>
+              {egeExams.map((exam) => (
+                <div
+                  key={exam}
+                  className={`${styles.examCard} ${
+                    formData.user.exams.includes(exam) ? styles.selectedExam : ''
+                  }`}
+                  onClick={() => handleExamClick(exam)}
+                >
+                  {exam}
+                </div>
+              ))}
+            </div>
+          </label>
          
 
           <label className={styles.label}>
